@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
-import "./Chat.css";
-import axios from "axios";
-import { ChatService } from "../helpers/chat.service";
+import { useEffect, useState } from "react";
 import { initChatComponent } from "../helpers/chat.helper";
+import "./Chat.css";
 
 const Chat = () => {
   const [message, setMessage] = useState("");
@@ -20,11 +18,17 @@ const Chat = () => {
     });
   }, []);
 
+  useEffect(() => {
+    if (messages) {
+      const lastMessage = messages[messages.length - 1];
+      console.log("El mensaje cambió:", lastMessage);
+    }
+  }, [messages]);
+
   const handleSendMessage = () => {
     if (message.trim()) {
       setMessages((prevMessages) => {
         const newMessages = [...prevMessages, { sender: "me", text: message }];
-        // Después de agregar el mensaje, desplazamos el scroll hacia abajo
         setTimeout(() => {
           const messagesContainer: any = document.getElementById("messages");
           messagesContainer.scrollTop = messagesContainer.scrollHeight;
