@@ -1,5 +1,6 @@
 import axios, { Axios } from "axios";
 import { ChatService } from "./chat.service";
+import { Chat, Message, ServerMessage, SourceMessage } from "./chat.type";
 
 export const sseMessages = (messageSet: Function) => {
   const eventSource = new EventSource("http://localhost:3003/messages");
@@ -23,10 +24,21 @@ export const initChat = async (
   messagesSet: Function
 ) => {
   //agregar try catch
-  let chat = await getChat(false);
+  let chat: any = await getChat(false);
   if (!chat) chat = await createChat();
 
   chatSet(chat);
+
+  const chatServerMessage: ServerMessage[] = chat.messages;
+  
+  for(const msg of chatServerMessage) {
+
+    const message: Message = {
+      text: msg.presetMessage.text,
+      source: SourceMessage.SERVER,
+    }
+    messagesSet((prevMessages: Message[]) => [...prevMessages, message]);
+  }
 };
 
 export const getChat = async (fail = true) => {

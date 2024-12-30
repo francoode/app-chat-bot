@@ -1,19 +1,15 @@
 import { useEffect, useState } from "react";
 import { initChat, sseMessages } from "../helpers/chat.helper";
 import "./Chat.css";
-import { Message } from "../helpers/chat.type";
+import { Message, SourceMessage } from "../helpers/chat.type";
 
 const Chat = () => {
+  const [chat, setChat] = useState(null);
   const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [chat, setChat] = useState(null);
-
-  /* 
-    { sender: "me", text: "Hola, ¿cómo estás?" },
-    { sender: "other", text: "¡Bien! ¿Y tú?" }, */
 
   //ComponentInit
   useEffect(() => {
@@ -22,7 +18,7 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
-    console.log('Cambio chat');
+    console.log("Cambio chat");
     console.log(chat);
   }, [chat]);
 
@@ -40,18 +36,19 @@ const Chat = () => {
     }
   }, [messages]);
 
-  
-
   const handleSendMessage = () => {
     if (message.trim()) {
-      setMessages((prevMessages) => {
-        return [...prevMessages, { sender: "me", text: message }];
-      });
+      /* setMessages((prevMessages) => {
+        return [
+          ...prevMessages,
+          { source: SourceMessage.CLIENT, text: message },
+        ];
+      }); */
       setMessage(""); // Limpiar el input
     }
 
-     //Scroll al final del contenedor de mensajes
-     setTimeout(() => {
+    //Scroll al final del contenedor de mensajes
+    setTimeout(() => {
       const messagesContainer: any = document.getElementById("messages");
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }, 100);
@@ -63,7 +60,7 @@ const Chat = () => {
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`message ${msg.sender === "me" ? "my-message" : "other-message"}`}
+            className={`message ${msg.source === SourceMessage.CLIENT ? "my-message" : "other-message"}`}
           >
             {msg.text}
           </div>
