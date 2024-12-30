@@ -1,42 +1,60 @@
 import { useEffect, useState } from "react";
-import { initChatComponent } from "../helpers/chat.helper";
+import { initChat, sseMessages } from "../helpers/chat.helper";
 import "./Chat.css";
+import { Message } from "../helpers/chat.type";
 
 const Chat = () => {
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([
-    { sender: "me", text: "Hola, ¿cómo estás?" },
-    { sender: "other", text: "¡Bien! ¿Y tú?" },
-  ]);
+  const [message, setMessage] = useState<string>("");
+  const [messages, setMessages] = useState<Message[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [chat, setChat] = useState(null);
+
+  /* 
+    { sender: "me", text: "Hola, ¿cómo estás?" },
+    { sender: "other", text: "¡Bien! ¿Y tú?" }, */
+
+  //ComponentInit
+  useEffect(() => {
+    sseMessages(setMessages);
+    initChat(setChat, setLoading, setMessages);
+  }, []);
 
   useEffect(() => {
-    initChatComponent({
-      error: { setter: setError, value: error },
-      loading: { setter: setLoading, value: error },
-    });
-  }, []);
+    console.log('Cambio chat');
+    console.log(chat);
+  }, [chat]);
 
   useEffect(() => {
     if (messages) {
       const lastMessage = messages[messages.length - 1];
       console.log("El mensaje cambió:", lastMessage);
+      /* async () => {
+        const data = await axios.post("http://localhost:3003/messages", {
+          chatId: 1,
+          optionSelectedId: 1,
+          presetMessageId: 1
+        });
+      }; */
     }
   }, [messages]);
+
+  
 
   const handleSendMessage = () => {
     if (message.trim()) {
       setMessages((prevMessages) => {
-        const newMessages = [...prevMessages, { sender: "me", text: message }];
-        setTimeout(() => {
-          const messagesContainer: any = document.getElementById("messages");
-          messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }, 100); // Usamos setTimeout para esperar que el DOM se actualice
-        return newMessages;
+        return [...prevMessages, { sender: "me", text: message }];
       });
       setMessage(""); // Limpiar el input
     }
+
+     //Scroll al final del contenedor de mensajes
+     setTimeout(() => {
+      const messagesContainer: any = document.getElementById("messages");
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }, 100);
   };
 
   return (
