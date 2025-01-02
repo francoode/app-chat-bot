@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { initChat, sseMessages } from "../helpers/chat.helper";
 import "./Chat.css";
-import { Message, SourceMessage } from "../helpers/chat.type";
+import { Message, Option, SourceMessage } from "../helpers/chat.type";
 
 const Chat = () => {
   const [chat, setChat] = useState(null);
@@ -54,6 +54,10 @@ const Chat = () => {
     }, 100);
   };
 
+  function handleOptionClick(option: Option): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <div className="chat-container">
       <div id="messages" className="messages">
@@ -62,7 +66,25 @@ const Chat = () => {
             key={index}
             className={`message ${msg.source === SourceMessage.CLIENT ? "my-message" : "other-message"}`}
           >
-            {msg.text}
+            {msg.source === SourceMessage.CLIENT ? (
+              msg.text
+            ) : (
+              <>
+                <div>{msg.presetMessage.text}</div>
+                <div className="options-container">
+                  {msg.presetMessage.options &&
+                    msg.presetMessage.options.map((option, optionIndex) => (
+                      <button
+                        key={optionIndex}
+                        className="preset-option-button"
+                        onClick={() => handleOptionClick(option)}
+                      >
+                        {option.title}
+                      </button>
+                    ))}
+                </div>
+              </>
+            )}
           </div>
         ))}
       </div>

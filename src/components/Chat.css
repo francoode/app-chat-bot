@@ -77,3 +77,23 @@ button {
 button:hover {
   background-color: #005fa2;
 }
+
+.options-container {
+  display: flex;
+  flex-direction: column; /* Asegura que los botones estén en columna */
+  gap: 10px; /* Espaciado entre botones */
+}
+
+.preset-option-button {
+  width: 100%; /* Ocupa todo el ancho del contenedor */
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.preset-option-button:hover {
+  background-color: #0056b3;
+}
