@@ -37,7 +37,7 @@
   border-radius: 15px 15px 15px 0; /* Borde redondeado solo en la parte derecha */
 }
 
-.other-message {
+.server-message {
   align-self: flex-end; /* Alinear a la derecha */
   background-color: #f1f1f1;
   color: #333;

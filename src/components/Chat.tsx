@@ -1,101 +1,63 @@
 import { useEffect, useState } from "react";
 import { initChat, sseMessages } from "../helpers/chat.helper";
 import "./Chat.css";
-import { Message, Option, SourceMessage } from "../helpers/chat.type";
+import {
+  Option,
+  SourceMessage,
+  DisplayMessage,
+  ChatModel,
+  ServerMessageModel,
+} from "../helpers/chat.type";
+import ServerMessage from "./ServerMessage";
 
 const Chat = () => {
-  const [chat, setChat] = useState(null);
+  const [chat, setChat] = useState<ChatModel | null>(null);
   const [message, setMessage] = useState<string>("");
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<DisplayMessage[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  //ComponentInit
   useEffect(() => {
-    sseMessages(setMessages);
-    initChat(setChat, setLoading, setMessages);
+    //sseMessages(setMessages);
+    const fetchData = async () => {
+      const chat = await initChat();
+      setChat(chat);
+      setMessages(chat.messages);
+    };
+    fetchData();
   }, []);
 
-  useEffect(() => {
-    console.log("Cambio chat");
-    console.log(chat);
-  }, [chat]);
-
-  useEffect(() => {
-    if (messages) {
-      const lastMessage = messages[messages.length - 1];
-      console.log("El mensaje cambió:", lastMessage);
-      /* async () => {
-        const data = await axios.post("http://localhost:3003/messages", {
-          chatId: 1,
-          optionSelectedId: 1,
-          presetMessageId: 1
-        });
-      }; */
-    }
-  }, [messages]);
-
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      /* setMessages((prevMessages) => {
-        return [
-          ...prevMessages,
-          { source: SourceMessage.CLIENT, text: message },
-        ];
-      }); */
-      setMessage(""); // Limpiar el input
-    }
-
-    //Scroll al final del contenedor de mensajes
+  const handleOptionClick = async (option: Option) => {
     setTimeout(() => {
       const messagesContainer: any = document.getElementById("messages");
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }, 100);
   };
 
-  function handleOptionClick(option: Option): void {
-    throw new Error("Function not implemented.");
-  }
-
   return (
     <div className="chat-container">
       <div id="messages" className="messages">
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`message ${msg.source === SourceMessage.CLIENT ? "my-message" : "other-message"}`}
-          >
-            {msg.source === SourceMessage.CLIENT ? (
-              msg.text
-            ) : (
-              <>
-                <div>{msg.presetMessage.text}</div>
-                <div className="options-container">
-                  {msg.presetMessage.options &&
-                    msg.presetMessage.options.map((option, optionIndex) => (
-                      <button
-                        key={optionIndex}
-                        className="preset-option-button"
-                        onClick={() => handleOptionClick(option)}
-                      >
-                        {option.title}
-                      </button>
-                    ))}
-                </div>
-              </>
-            )}
-          </div>
-        ))}
+        {messages.map((message, index) =>
+          message.source === "SERVER" ? (
+            <ServerMessage
+              message={message.message as ServerMessageModel}
+              index={index}
+            />
+          ) : (
+            <div></div>
+            //<ClientMessage message={message} index={index} />
+          )
+        )}
       </div>
       <div className="input-container">
         <input
           type="text"
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
           placeholder="Escribe un mensaje..."
+          disabled
         />
-        <button onClick={handleSendMessage}>Enviar</button>
+        <button disabled>Enviar</button>
       </div>
     </div>
   );
